@@ -1,3 +1,5 @@
+package Shapes;
+
 import Constants.TetrominoesColors;
 import Constants.TetrominoesShapes;
 
@@ -10,7 +12,7 @@ public class Shape {
     private Tetrominoes pieceShape;
     private int[][] coords;
 
-    enum Tetrominoes {
+    public enum Tetrominoes {
         NoShape(TetrominoesShapes.NOSHAPE, TetrominoesColors.NOSHAPE),
         ZShape(TetrominoesShapes.ZSHAPE, TetrominoesColors.ZSHAPE),
         SHape(TetrominoesShapes.SSHAPE, TetrominoesColors.SSHAPE),
@@ -23,11 +25,10 @@ public class Shape {
         public int[][] coords;
         public Color color;
 
-        private Tetrominoes(int[][] coords, Color c){
+        Tetrominoes(int[][] coords, Color c){
             this.coords = coords;
             color = c;
         }
-
     }
 
     public Shape(){
