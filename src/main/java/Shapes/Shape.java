@@ -52,7 +52,7 @@ public class Shape {
     }
 
     private void setY(int index, int y) {
-        coords[0][index] = y;
+        coords[index][1] = y;
     }
 
     public int getX(int index) {

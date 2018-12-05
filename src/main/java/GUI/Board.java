@@ -32,6 +32,7 @@ public class Board extends JPanel implements ActionListener {
         statusBar = parent.getStatusBar();
         board = new Tetrominoes[BoardSize.WIDTH * BoardSize.HEIGHT];
         addKeyListener(new TetrisKeyListener());
+        setBackground(Color.BLACK);
     }
 
     public int squareWidht() {
@@ -191,7 +192,7 @@ public class Board extends JPanel implements ActionListener {
         for (int i = BoardSize.HEIGHT - 1; i >= 0; --i){
             boolean lineIsFull = true;
 
-            for(int j = 0; j < BoardSize.WIDTH; j++) {
+            for(int j = 0; j < BoardSize.WIDTH; ++j) {
                 if(shapeAt(j, i) == Tetrominoes.NoShape) {
                     lineIsFull = false;
                     break;
@@ -201,21 +202,22 @@ public class Board extends JPanel implements ActionListener {
             if(lineIsFull) {
                 ++numFullLines;
 
-                for(int k = i; k < BoardSize.HEIGHT - 1; k++){
-                    for(int j = 0; j < BoardSize.WIDTH; j++) {
+                for(int k = i; k < BoardSize.HEIGHT - 1; ++k){
+                    for(int j = 0; j < BoardSize.WIDTH; ++j) {
                         board[k * BoardSize.WIDTH + j] = shapeAt(j, k + 1);
                     }
                 }
+                System.out.println(numFullLines);
             }
-
-            if(numFullLines > 0){
-                numLinesRemoved += numFullLines;
-                statusBar.setText(String.valueOf(numLinesRemoved));
-                isFallingFinished = true;
-                curPiece.setShape(Tetrominoes.NoShape);
-                repaint();
-            }
-
+        }
+        
+        if(numFullLines > 0){
+            numLinesRemoved += numFullLines;
+            System.out.println(numLinesRemoved);
+            statusBar.setText(String.valueOf(numLinesRemoved));
+            isFallingFinished = true;
+            curPiece.setShape(Tetrominoes.NoShape);
+            repaint();
         }
 
     }
