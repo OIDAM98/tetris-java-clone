@@ -53,12 +53,21 @@ public class Sounds {
         playSound(ROTATE);
     }
 
+    /**
+     * Plays a specific sound
+     * @param toPlay Sound to be Played
+     */
 
     private static synchronized void playSound(String toPlay) {
         try {
+            /*
+                Gets audio file
+                Every audio file for the game is under the folder /src/main/resources
+             */
             AudioInputStream audio = AudioSystem.getAudioInputStream(new File("src/main/resources/" + toPlay).getAbsoluteFile());
-            clip = AudioSystem.getClip();
+            clip = AudioSystem.getClip(); //Initializes clip to play audio file
 
+            //Adds a LineListener that is in charge of indicating when the clip has stopped playing a sound
             clip.addLineListener(e -> {
                 if(e.getType() == LineEvent.Type.STOP){ //When it stops running
                     synchronized (clip) {
@@ -80,6 +89,7 @@ public class Sounds {
                 }
             }
 
+            //Unloads clip and closes it
             clip.drain();
             clip.stop();
             clip.close();

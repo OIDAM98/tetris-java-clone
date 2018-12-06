@@ -17,7 +17,6 @@ public class Tetris extends JFrame {
         setLayout(new BorderLayout());
         getContentPane().setBackground(new Color(49, 62, 129));
 
-
         add(statusBar, BorderLayout.SOUTH);
 
         Board board = new Board(this);

@@ -23,7 +23,7 @@ public class Board extends JPanel implements ActionListener {
     private boolean isPaused = false;
 
     private int numLinesRemoved = 0;
-    private int currentLevel = 1;
+    private int currentLevel = 0;
     private int currentScore = 0;
 
     private int curX = 0;
@@ -34,6 +34,14 @@ public class Board extends JPanel implements ActionListener {
     private Shape curPiece;
     private Tetrominoes[] board;
     private SidePanel configs;
+
+    /**
+     * Default Constructor, receives the Parent Component (a Tetris instance)
+     * to get its Status Bar
+     *
+     * Initializes Timer, the board, and sets background color
+     * @param p Parent Component (Tetris instance)
+     */
 
     public Board(Tetris p) {
         setFocusable(true);
@@ -86,12 +94,23 @@ public class Board extends JPanel implements ActionListener {
 
     //Altering State Methods
 
+    /**
+     * Starts the game, except when it's paused
+     * Clears board, restarts score and line values
+     * Starts Timer
+     * Plays a Sound indicating game is starting
+     */
+
     public void start(){
         if(isPaused) return;
 
         isStarted = true;
         isFallingFinished = false;
+
         numLinesRemoved = 0;
+        currentScore = 0;
+        currentLevel = 0;
+
         clearBoard();
         newPiece();
         timer.start();
@@ -103,6 +122,10 @@ public class Board extends JPanel implements ActionListener {
         configs.updateCurrentScore();
         configs.updateLevel();
     }
+
+    /**
+     * Pauses current game, either if it isn't paused or it isn't started
+     */
 
     public void pause(){
         if(!isStarted) return;
@@ -136,10 +159,10 @@ public class Board extends JPanel implements ActionListener {
     /**
      * Updates the current score depending on the lines cleared
      * Formula:
-     *  1.- score = 40 * currentLevel
-     *  2.- score = 100 * currentLevel
-     *  3.- score = 300 * currentLevel
-     *  4.- score = 1200 * currentLevel
+     *  1.- score = 40 * currentLevel + 1
+     *  2.- score = 100 * currentLevel + 1
+     *  3.- score = 300 * currentLevel + 1
+     *  4.- score = 1200 * currentLevel + 1
      * @param n number of lines removed
      */
 
@@ -147,18 +170,17 @@ public class Board extends JPanel implements ActionListener {
         int score = 0;
         switch (n){
             case 1:
-                score = 40 * currentLevel;
+                score = 40 * currentLevel + 1;
                 break;
             case 2:
-                score = 100 * currentLevel;
+                score = 100 * currentLevel + 1;
                 break;
             case 3:
-                score = 300 * currentLevel;
+                score = 300 * currentLevel + 1;
                 break;
             case 4:
-                score = 1200 * currentLevel;
+                score = 1200 * currentLevel + 1;
                 break;
-
         }
 
         currentScore += score; //Updates score
@@ -166,9 +188,19 @@ public class Board extends JPanel implements ActionListener {
 
     }
 
+    /**
+     * Calculates width of one Tetromino square depending on current size of Board
+     * @return width of Tetromino's square
+     */
+
     public int squareWidth() {
         return (int) getSize().getWidth() / BoardSize.WIDTH;
     }
+
+    /**
+     * Calculates height of one Tetromino square depending on current size of Board
+     * @return height of Tetromino's square
+     */
 
     public int squareHeight() {
         return (int) getSize().getHeight() / BoardSize.HEIGHT;
@@ -178,11 +210,19 @@ public class Board extends JPanel implements ActionListener {
         return board[y * BoardSize.WIDTH + x];
     }
 
+    /**
+     * Clears Board
+     */
+
     private void clearBoard() {
         for(int i = 0; i < BoardSize.HEIGHT * BoardSize.WIDTH; i++){
             board[i] = Tetrominoes.NoShape;
         }
     }
+
+    /**
+     * Method called when a piece is dropped on Board
+     */
 
     private void pieceDropped() {
         for(int i = 0; i < 4; i++){
@@ -288,18 +328,36 @@ public class Board extends JPanel implements ActionListener {
 
     //Logic Methods
 
+    /**
+     * Tries moving left current Tetromino
+     */
+
     public void tryMoveLeft(){
         tryMove(curPiece, curX - 1, curY);
     }
+
+    /**
+     * Tries moving right current Tetromino
+     */
 
     public void tryMoveRight(){
         tryMove(curPiece, curX + 1, curY);
     }
 
+    /**
+     * Tries rotating to the Left current Tetromino
+     * Plays a sound while doing it
+     */
+
     public void tryRotateLeft(){
         tryMove(curPiece.rotateLeft(), curX, curY);
         Sounds.playRotate();
     }
+
+    /**
+     * Tries rotating Right current Tetromino
+     * Plays a sound while doing it
+     */
 
     public void tryRotateRight(){
         tryMove(curPiece.rotateRight(), curX, curY);
@@ -337,11 +395,16 @@ public class Board extends JPanel implements ActionListener {
 
     }
 
+    /**
+     * Mehotd for simulating a Hard Drop of Tetromino
+     */
+
     public void dropDown() {
         int newY = curY;
 
         while (newY > 0) {
-            if(!tryMove(curPiece, curX, newY - 1)) break;
+            if(!tryMove(curPiece, curX, newY - 1)) //Stops fall down when reached either another Tetromino or Board Bottom
+                break;
 
             --newY;
         }
@@ -411,7 +474,7 @@ public class Board extends JPanel implements ActionListener {
                     break;
             }
 
-            updateScore(numFullLines);
+            updateScore(numFullLines); //Visually updates Score
 
             //Makes a range  of 1's for numberOfLinesCleared
             int[] range = IntStream.range(0, numFullLines).map(v -> 1).toArray();
@@ -425,7 +488,7 @@ public class Board extends JPanel implements ActionListener {
                 }
             }
 
-            configs.updateLines();
+            configs.updateLines(); //Visually updates current lines removed
 
             isFallingFinished = true;
 
