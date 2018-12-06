@@ -40,6 +40,7 @@ public class Board extends JPanel implements ActionListener {
 
         this.parent = p;
         statusBar = parent.getStatusBar();
+        statusBar.setBackground(new Color(49, 62, 129));
 
         curPiece = new Shape();
 
@@ -95,6 +96,12 @@ public class Board extends JPanel implements ActionListener {
         newPiece();
         timer.start();
         Sounds.playStart();
+
+        statusBar.setText("");
+
+        configs.updateLines();
+        configs.updateCurrentScore();
+        configs.updateLevel();
     }
 
     public void pause(){
@@ -104,11 +111,13 @@ public class Board extends JPanel implements ActionListener {
 
         if (isPaused) {
             timer.stop();
+
             statusBar.setText("Paused");
+
         }
         else {
             timer.start();
-            statusBar.setText(String.valueOf(numLinesRemoved));
+            statusBar.setText("");
         }
 
         repaint();
@@ -121,7 +130,7 @@ public class Board extends JPanel implements ActionListener {
         currentLevel++; //Increases current level
         int delay = LevelSpeeds.getLevel(currentLevel); //Gets from LevelSpeeds (Constant) the delay according to the level
         timer.setDelay(delay); //Updates delay
-        parent.getSidePanel().updateLevel();
+        configs.updateLevel();
     }
 
     /**
@@ -141,7 +150,7 @@ public class Board extends JPanel implements ActionListener {
                 score = 40 * currentLevel;
                 break;
             case 2:
-                score = 200 * currentLevel;
+                score = 100 * currentLevel;
                 break;
             case 3:
                 score = 300 * currentLevel;
@@ -404,7 +413,9 @@ public class Board extends JPanel implements ActionListener {
 
             updateScore(numFullLines);
 
-            int[] range = IntStream.rangeClosed(1, numFullLines).toArray(); //Makes range between 1 and numberOfLinesCleared
+            //Makes a range  of 1's for numberOfLinesCleared
+            int[] range = IntStream.range(0, numFullLines).map(v -> 1).toArray();
+
 
             //Sums values of range to numberOfLinesRemoved
             for(int sum : range){
@@ -415,8 +426,6 @@ public class Board extends JPanel implements ActionListener {
             }
 
             configs.updateLines();
-
-            statusBar.setText(String.valueOf(numLinesRemoved));
 
             isFallingFinished = true;
 

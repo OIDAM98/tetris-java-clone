@@ -10,8 +10,14 @@ public class Tetris extends JFrame {
     private Board b;
 
     public Tetris() {
-        statusBar = new JLabel("0");
+        statusBar = new JLabel("");
+        statusBar.setForeground(Color.WHITE);
+        statusBar.setFont(new Font("Arial", Font.BOLD, 30));
+
         setLayout(new BorderLayout());
+        getContentPane().setBackground(new Color(49, 62, 129));
+
+
         add(statusBar, BorderLayout.SOUTH);
 
         Board board = new Board(this);
@@ -34,10 +40,6 @@ public class Tetris extends JFrame {
 
     public JLabel getStatusBar(){
         return statusBar;
-    }
-
-    public SidePanel getSidePanel(){
-        return s;
     }
 
     public Board getBoard(){
