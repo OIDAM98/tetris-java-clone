@@ -170,16 +170,16 @@ public class Board extends JPanel implements ActionListener {
         int score = 0;
         switch (n){
             case 1:
-                score = 40 * currentLevel + 1;
+                score = 40 * (currentLevel + 1);
                 break;
             case 2:
-                score = 100 * currentLevel + 1;
+                score = 100 * (currentLevel + 1);
                 break;
             case 3:
-                score = 300 * currentLevel + 1;
+                score = 300 * (currentLevel + 1);
                 break;
             case 4:
-                score = 1200 * currentLevel + 1;
+                score = 1200 * (currentLevel + 1);
                 break;
         }
 
