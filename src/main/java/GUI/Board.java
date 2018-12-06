@@ -4,12 +4,14 @@ import javax.swing.*;
 
 import Constants.BoardSize;
 import Constants.LevelSpeeds;
+import Constants.Sounds;
 import Shapes.Shape;
 import Shapes.Shape.Tetrominoes;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.stream.IntStream;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -22,6 +24,7 @@ public class Board extends JPanel implements ActionListener {
 
     private int numLinesRemoved = 0;
     private int currentLevel = 1;
+    private int currentScore = 0;
 
     private int curX = 0;
     private int curY = 0;
@@ -30,6 +33,7 @@ public class Board extends JPanel implements ActionListener {
 
     private Shape curPiece;
     private Tetrominoes[] board;
+    private SidePanel configs;
 
     public Board(Tetris p) {
         setFocusable(true);
@@ -44,7 +48,7 @@ public class Board extends JPanel implements ActionListener {
 
         addKeyListener(new TetrisKeyListener(this));
 
-        setBackground(Color.CYAN.darker());
+        setBackground(Color.DARK_GRAY);
     }
 
     //Getters
@@ -60,6 +64,25 @@ public class Board extends JPanel implements ActionListener {
         return curPiece;
     }
 
+    public int getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public int getNumLinesRemoved(){
+        return numLinesRemoved;
+    }
+
+    public int getCurrentScore(){
+        return currentScore;
+    }
+
+    //Setters
+
+    public void setConfigs(SidePanel configs) {
+        this.configs = configs;
+    }
+
+
     //Altering State Methods
 
     public void start(){
@@ -71,6 +94,7 @@ public class Board extends JPanel implements ActionListener {
         clearBoard();
         newPiece();
         timer.start();
+        Sounds.playStart();
     }
 
     public void pause(){
@@ -97,6 +121,40 @@ public class Board extends JPanel implements ActionListener {
         currentLevel++; //Increases current level
         int delay = LevelSpeeds.getLevel(currentLevel); //Gets from LevelSpeeds (Constant) the delay according to the level
         timer.setDelay(delay); //Updates delay
+        parent.getSidePanel().updateLevel();
+    }
+
+    /**
+     * Updates the current score depending on the lines cleared
+     * Formula:
+     *  1.- score = 40 * currentLevel
+     *  2.- score = 100 * currentLevel
+     *  3.- score = 300 * currentLevel
+     *  4.- score = 1200 * currentLevel
+     * @param n number of lines removed
+     */
+
+    private void updateScore(int n){
+        int score = 0;
+        switch (n){
+            case 1:
+                score = 40 * currentLevel;
+                break;
+            case 2:
+                score = 200 * currentLevel;
+                break;
+            case 3:
+                score = 300 * currentLevel;
+                break;
+            case 4:
+                score = 1200 * currentLevel;
+                break;
+
+        }
+
+        currentScore += score; //Updates score
+        configs.updateCurrentScore(); //Visually updates score
+
     }
 
     public int squareWidth() {
@@ -132,16 +190,26 @@ public class Board extends JPanel implements ActionListener {
 
     }
 
+    /**
+     * Creates new Tetromino at the center of the Board to start falling down
+     */
+
     public void newPiece() {
         curPiece.setRandomShape();
         curX = BoardSize.WIDTH / 2 + 1;
         curY = BoardSize.HEIGHT - 1 + curPiece.minY();
 
+        /*
+            Checks for Game Over:
+            Only GameOver if Tetromino cannot be moved one line down
+            when it appears. => Board Full!
+         */
         if(!tryMove(curPiece, curX, curY - 1)){
             curPiece.setShape(Tetrominoes.NoShape);
             timer.stop();
             isStarted = false;
             statusBar.setText("Game Over!");
+            Sounds.playOver();
         }
 
     }
@@ -157,9 +225,17 @@ public class Board extends JPanel implements ActionListener {
     }
 
 
+    /**
+     * Draws part of a Tetromino, a square, depending on its Shape and its x,y position on the board
+     * @param g Graphics component where to paint
+     * @param x Coordinate X of Tetromino
+     * @param y Coordinate Y of Tetromino
+     * @param shape Shape of Tetromino
+     */
     public void drawSquare(Graphics g, int x, int y, Tetrominoes shape){
         Color color = shape.color;
         g.setColor(color);
+        //Make rectangle of Tetromino
         g.fillRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2);
 
         //Paints small gradient between the Tetromino and its border
@@ -168,7 +244,7 @@ public class Board extends JPanel implements ActionListener {
         g.drawLine(x, y, x + squareWidth() - 1, y);
 
         //Paints border of tetromino
-        g.setColor(Color.BLACK);
+        g.setColor(color.darker());
         g.drawLine(x + 1, y + squareHeight() - 1, x + squareWidth() - 1, y + squareHeight() - 1);
         g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x + squareWidth() - 1, y + 1);
     }
@@ -213,11 +289,21 @@ public class Board extends JPanel implements ActionListener {
 
     public void tryRotateLeft(){
         tryMove(curPiece.rotateLeft(), curX, curY);
+        Sounds.playRotate();
     }
 
     public void tryRotateRight(){
         tryMove(curPiece.rotateRight(), curX, curY);
+        Sounds.playRotate();
     }
+
+    /**
+     * Tries to move a specified Tetromino to a new x,y position.
+     * @param piece Tetromino to move
+     * @param newX Coordinate X to move to
+     * @param newY Coordinate Y to move to
+     * @return returns if the move is possibe to make
+     */
 
     private boolean tryMove(Shape piece, int newX, int newY){
         for(int i = 0; i < 4; i++){
@@ -255,11 +341,21 @@ public class Board extends JPanel implements ActionListener {
 
     }
 
+    /**
+     * Moves current Tetromino one line below
+     */
+
     public void oneLineDown() {
         if(!tryMove(curPiece, curX, curY - 1)){
             pieceDropped();
         }
     }
+
+    /**
+     * Removes full lines made in the Board.
+     *  Scans the Board to find them, deletes them and overlaps
+     *  current shape with the one found above.
+     */
 
     private void removeFullLines() {
         int numFullLines = 0;
@@ -285,14 +381,47 @@ public class Board extends JPanel implements ActionListener {
             }
         }
 
+        //Plays sound depending on the number of lines removed
+
         if(numFullLines > 0){
-            numLinesRemoved += numFullLines;
-            statusBar.setText(String.valueOf(numLinesRemoved));
-            if(numLinesRemoved % 10 == 0){
-                updateLevel();
+
+            switch (numFullLines) {
+                case 1:
+                    Sounds.playClearLine();
+                    break;
+                case 2:
+                    Sounds.playClearTwo();
+                    break;
+                case 3:
+                    Sounds.playClearThree();
+                    break;
+                case 4:
+                    Sounds.playClearTetris();
+                    break;
+                default:
+                    break;
             }
+
+            updateScore(numFullLines);
+
+            int[] range = IntStream.rangeClosed(1, numFullLines).toArray(); //Makes range between 1 and numberOfLinesCleared
+
+            //Sums values of range to numberOfLinesRemoved
+            for(int sum : range){
+                numLinesRemoved += sum;
+                if(numLinesRemoved % 10 == 0){ //Check if numOfLinesRemoved has reached a multiple of 10 to increase Level
+                    updateLevel();
+                }
+            }
+
+            configs.updateLines();
+
+            statusBar.setText(String.valueOf(numLinesRemoved));
+
             isFallingFinished = true;
+
             curPiece.setShape(Tetrominoes.NoShape);
+
             repaint();
         }
 

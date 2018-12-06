@@ -7,18 +7,27 @@ public class Tetris extends JFrame {
 
     private JLabel statusBar;
     private SidePanel s;
+    private Board b;
 
     public Tetris() {
         statusBar = new JLabel("0");
         setLayout(new BorderLayout());
         add(statusBar, BorderLayout.SOUTH);
+
         Board board = new Board(this);
-        //NextPiece n = new NextPiece();
-        //s = new SidePanel(n);
-        add(board, BorderLayout.CENTER);
-        //add(s, BorderLayout.EAST);
-        board.start();
-        setSize(500, 700);
+        b = board;
+
+        SidePanel side = new SidePanel(this);
+        s = side;
+
+        b.setConfigs(s);
+
+        add(b, BorderLayout.CENTER);
+        add(s, BorderLayout.EAST);
+
+        b.start();
+        setSize(1000, 900);
+        setResizable(false);
         setTitle("Tetris!");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
@@ -29,6 +38,10 @@ public class Tetris extends JFrame {
 
     public SidePanel getSidePanel(){
         return s;
+    }
+
+    public Board getBoard(){
+        return b;
     }
 
 }
