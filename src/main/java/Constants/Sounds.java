@@ -10,18 +10,19 @@
 package Constants;
 
 import javax.sound.sampled.*;
-import java.io.File;
 import java.io.IOException;
 
 public class Sounds {
 
-    private static final String START = "GameStart.wav";
-    private static final String OVER = "GameOver.wav";
-    private static final String CLEARLINE = "LineClearSingle.wav";
-    private static final String CLEARTWO = "LineClearDouble.wav";
-    private static final String CLEARTHREE = "LineClearTriple.wav";
-    private static final String CLEARTETRIS = "Tetris.wav";
-    private static final String ROTATE = "Rotate.wav";
+    private static final String START = "Sounds/GameStart.wav";
+    private static final String OVER = "Sounds/GameOver.wav";
+    private static final String CLEARLINE = "Sounds/LineClearSingle.wav";
+    private static final String CLEARTWO = "Sounds/LineClearDouble.wav";
+    private static final String CLEARTHREE = "Sounds/LineClearTriple.wav";
+    private static final String CLEARTETRIS = "Sounds/Tetris.wav";
+    private static final String ROTATE = "Sounds/Rotate.wav";
+
+    private static final ClassLoader loader = ClassLoader.getSystemClassLoader();
 
     private static Clip clip;
 
@@ -64,7 +65,7 @@ public class Sounds {
                 Gets audio file
                 Every audio file for the game is under the folder /src/main/resources
              */
-            AudioInputStream audio = AudioSystem.getAudioInputStream(new File("src/main/resources/" + toPlay).getAbsoluteFile());
+            AudioInputStream audio = AudioSystem.getAudioInputStream(ClassLoader.getSystemClassLoader().getResource(toPlay));
             clip = AudioSystem.getClip(); //Initializes clip to play audio file
 
             //Adds a LineListener that is in charge of indicating when the clip has stopped playing a sound

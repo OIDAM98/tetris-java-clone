@@ -8,6 +8,7 @@ public class SidePanel extends JPanel {
     private JLabel level;
     private JLabel score;
     private JLabel lines;
+    private JLabel image;
 
     private final Font LABEL_FONT = new Font("Arial", Font.PLAIN, 32);
     private final Font STATE_FONT = new Font("Arial", Font.BOLD, 30);
@@ -45,6 +46,15 @@ public class SidePanel extends JPanel {
     }
 
     private void generatePanel(){
+        ImageIcon img = new ImageIcon(ClassLoader.getSystemClassLoader().getResource("tetris2.png"));
+        Image imgRes = img.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+        image = new JLabel();
+        image.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+        image.setIcon(new ImageIcon(imgRes));
+        add(image);
+
+        add(Box.createVerticalGlue());
+
         JLabel temp;
 
         temp = new JLabel("LEVEL");

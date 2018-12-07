@@ -13,6 +13,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.stream.IntStream;
 
+/**
+ * Class that represents a Tetris Board in a Panel.
+ * Implements an ActionListener that goes side-by-side
+ * with a Timer, that simulates the falling down of a Tetromino.
+ *
+ */
+
 public class Board extends JPanel implements ActionListener {
 
     private Tetris parent;
