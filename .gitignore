@@ -3,7 +3,7 @@ project/target
 target/
 out/
 .attach*
-
+*.png
 
 # Compiled class file
 *.class

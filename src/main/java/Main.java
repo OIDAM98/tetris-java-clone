@@ -1,7 +1,6 @@
 /*
 Created by: Oscar Ivan De Alva Martinez
 
-Image Logo made By: Sandra Lorena Carranza Matuk
  */
 
 
